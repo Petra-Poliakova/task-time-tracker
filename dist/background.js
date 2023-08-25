@@ -1,0 +1,1 @@
+!function(){"use strict";chrome.runtime.onMessage.addListener((function(e,o,n){console.log("msg",e),console.log("sender",o),n("From the background script!")}))}();

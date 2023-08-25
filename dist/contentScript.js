@@ -1,1 +1,0 @@
-!function(){"use strict";chrome.runtime.sendMessage("From the content script!",(function(e){console.log(e)}))}();

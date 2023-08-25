@@ -16,11 +16,11 @@ interface ITodos {
 function Popup() {
   const [data, loading] = useFetch<ITodos>('https://dummyjson.com/todos',  { todos: [] });
 
-  if(loading) return <p>Loading</p>
+  if(loading) return <p>Loading...</p>
 
   console.log('data', data)
   return (
-    <div className="App">
+    <div>
       {data.todos.map((todo, index) => {
         return(
           <div key={index}>

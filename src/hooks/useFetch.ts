@@ -11,7 +11,6 @@ export const useFetch = <T,>(url: string, intialState: T): [T, boolean] => {
             fetch(url)
             .then((response) => response.json())
             .then((data) => {
-              console.log(data)
               setData(data);
             })
             .finally(() => setLoading(false));
@@ -21,4 +20,6 @@ export const useFetch = <T,>(url: string, intialState: T): [T, boolean] => {
   
     return [data, loading];
 }
- //https://www.youtube.com/watch?v=tMpn7oUsNGA
+
+//SetTimeout is only fo testing
+//https://www.youtube.com/watch?v=tMpn7oUsNGA

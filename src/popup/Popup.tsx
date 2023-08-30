@@ -73,3 +73,11 @@ function Popup() {
 }
 
 export default Popup;
+
+
+//https://www.youtube.com/watch?v=vzrwpaYwE5s&list=PLBS1L3Ug2VVpgpDEcLmapOk52mVGv4MIu&index=3
+//https://github.com/manshu/reactjs-chrome-extension-oauth2/blob/master/src/routes/Authentication.js
+
+//https://www.youtube.com/watch?v=H-anyDrYHyg&list=PLIckDtOkqwLv56F0c8zbHDivaUQgJr9xw
+
+//https://tasoskakour.com/blog/react-use-oauth2

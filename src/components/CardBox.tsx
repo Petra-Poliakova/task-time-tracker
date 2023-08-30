@@ -35,7 +35,7 @@ export const CardBox = ({}) => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">DELETE</Button>
+          <Button size="small">SEND TASK AS COMPLETED</Button>
         </CardActions>
       </Card>
     </>

@@ -5,24 +5,28 @@ import {
   CardActions,
   Button,
   Typography,
+  Checkbox
 } from "@mui/material";
 
 interface ITaskItem {
-  id: string;
+  id: number;
   value: string;
-  completed: boolean;
+  todo: string;
+  //completed: boolean;
+  onChecked: () => void
 }
 
-export const CardBox = ({}) => {
+export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo}) => {
+
   return (
     <>
-      <Card variant="outlined">
+      <Card variant="outlined" style={{margin:'15px 0'}}>
         <CardContent>
           <Typography variant="h5" component="div">
-            Nazov Tasku
+           {todo}
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Id: 000
+            ID: {id}
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
             Timer: 00:00:00
@@ -31,7 +35,12 @@ export const CardBox = ({}) => {
             Total worked time: 00:00:00
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-            Completed: false
+          Completed:
+            <Checkbox
+              //checked={completed} v prípade keby som nechcela zaškrtávať
+              onChange={onChecked}
+              inputProps={{ 'aria-label': 'controlled' }}
+            />
           </Typography>
         </CardContent>
         <CardActions>

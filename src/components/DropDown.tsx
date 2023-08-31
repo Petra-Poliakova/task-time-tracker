@@ -18,7 +18,7 @@ export const DropDown: React.FC<DropDownProps> = ({options, value, onChange, lab
   <InputLabel id="demo-simple-select-label">{label}</InputLabel>
   <Select
     labelId="demo-simple-select-label"
-    id="demo-simple-select"
+    id={"demo-simple-select"}
     value={value}
     label={label}
     onChange={onChange}

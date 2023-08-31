@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Popup.css";
 import { useFetch } from "../hooks/useFetch";
 import { DropDown } from "../components/DropDown";
@@ -17,19 +17,17 @@ export interface ITasks {
 }
 
 function Popup() {
-  const [data, loading] = useFetch<ITasks>("https://dummyjson.com/todos", {
-    todos: [],
-  });
-  const [selectValue, setSelectValue] = useState<{
-    id: number | null;
-    value: string;
-    completed: boolean;
-  }>({
-    value: "",
-    id: null,
-    completed: false,
-  });
+  const [data, loading] = useFetch<ITasks>("https://dummyjson.com/todos?limit=20&skip=10", { todos: [] });
+  const [tasks, setTasks] = useState<ITaskItem[]>([]);
+  const [selectTask, setSelectTask] = useState<{ id: number | null; value: string; todo: string; completed: boolean; }>({id: null,  value: "",  completed: false, todo: "" });
+  const [remainingTasks, setRemainingTasks] = useState<ITasks[]>([]);
 
+  useEffect(()=>{
+    const tasksData = data.todos.map((task) => task);
+    setTasks(tasksData);
+   console.log('tasksData', tasksData)
+   },[data])
+  
   if (loading) return <p>Loading...</p>;
 
   if (!data || !data.todos) {
@@ -43,31 +41,45 @@ function Popup() {
     const selectedTask = data.todos.find(
       (task) => task.todo === e.target.value
     );
-    setSelectValue({
-      ...selectValue,
-      value: e.target.value,
-      id: selectedTask ? selectedTask.id : null,
-      completed: selectedTask ? selectedTask.completed : false,
-    });
+      setSelectTask({
+        ...selectTask,
+        value: e.target.value,
+        id: selectedTask ? selectedTask.id : null,
+        todo: selectedTask ? selectedTask.todo : "",
+        completed: selectedTask ? selectedTask.completed : false,
+      });
+      // if (selectedTask) {
+      //   setRemainingTasks(data.todos.filter((task) => task.id !== selectedTask.id));
+      // }
   };
 
-  console.log("data", data);
+  const onCheckedHandle = () => {
+    const updatedTask = data.todos.map((task) =>
+      task.id === selectTask.id
+        ? { ...task, completed: !selectTask.completed }
+        : task
+    );
+
+    //setTasks(updatedTask);
+  };
+
   return (
     <div>
       <DropDown
-        options={data.todos.map((task) => task.todo)}
-        value={selectValue.value}
+        //options={data.todos.map((task) => task.todo)}
+        options={tasks.map((task) => task.todo)}
+        value={selectTask.value}
         onChange={handleChange}
         label="Select a Task"
       />
-      <CardBox />
-      {selectValue && (
-        <div>
-          <p> Id: {selectValue.id}</p>
-          <p> Title: {selectValue.value}</p>
-          <p> Completed: {selectValue.completed.toString()}</p>
-        </div>
-      )}
+      {selectTask.id !== null && (
+        <CardBox
+        id={selectTask.id !== null ? selectTask.id : 0} 
+        value={selectTask.value}
+        todo={selectTask.todo}
+        //completed={selectTask.completed}
+        onChecked={onCheckedHandle}
+      />)}
     </div>
   );
 }

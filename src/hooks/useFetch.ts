@@ -7,14 +7,14 @@ export const useFetch = <T,>(url: string, intialState: T): [T, boolean] => {
 
     useEffect(() => {
         setLoading(true)
-        setTimeout(()=>{
+        //setTimeout(()=>{
             fetch(url)
             .then((response) => response.json())
             .then((data) => {
               setData(data);
             })
             .finally(() => setLoading(false));
-        }, 1500)
+        //}, 1500)
        
     }, [url]);
   

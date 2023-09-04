@@ -23,8 +23,11 @@ export const DropDown: React.FC<DropDownProps> = ({options, value, onChange, lab
     label={label}
     onChange={onChange}
   >
-    {options.map((item, index)=> {
-        return <MenuItem key={index} value={item}>{item}</MenuItem>
+    <MenuItem value=''><em>None</em></MenuItem>
+    {options && options.map((item, index)=> {
+        return (
+          <MenuItem key={index} value={item}>{item}</MenuItem>
+        ) 
     })}
   </Select>
 </FormControl>

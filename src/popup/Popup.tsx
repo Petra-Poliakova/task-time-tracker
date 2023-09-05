@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./Popup.css";
 import { useFetch } from "../hooks/useFetch";
 import { DropDown } from "../components/DropDown";
-import { SelectChangeEvent } from "@mui/material";
+import { SelectChangeEvent, Button } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 import { CardBox } from "../components/CardBox";
 
 interface ITaskItem {
@@ -32,7 +33,7 @@ function Popup() {
     todo: string;
     completed: boolean;
   }>({ id: null, value: "", completed: false, todo: "" });
-  const [remainingTasks, setRemainingTasks] = useState<ITaskItem[]>([]);
+  const [addedTasks, setAddedTasks] = useState<{ id: number | null; value: string; todo: string; completed: boolean; }[]>([]);
 
   useEffect(() => {
     const tasksData = data.todos.map((task) => task);
@@ -54,27 +55,46 @@ function Popup() {
       (task) => task.todo === e.target.value
     );
     setSelectTask({
-      ...selectTask,
+      //...selectTask,
       value: e.target.value,
       id: selectedTask ? selectedTask.id : null,
       todo: selectedTask ? selectedTask.todo : "",
       completed: selectedTask ? selectedTask.completed : false,
     });
-    if (selectedTask) {
-      fetch(`https://dummyjson.com/todos/${selectedTask.id}`, {
+    // if (selectedTask) {
+    //   fetch(`https://dummyjson.com/todos/${selectedTask.id}`, {
+    //     method: "DELETE",
+    //   })
+    //     .then((response) => response.json())
+    //     .then(() =>
+    //       setTasks(
+    //         tasks.filter((task) => task.id !== selectedTask.id)
+    //       )
+    //     );
+
+    //   console.log("selectedTask", selectedTask);
+    // }
+  };
+  console.log("remainingTasks", tasks);
+
+  const addTaskHandle = () => {
+    if (selectTask.id !== null) {
+      setAddedTasks([...addedTasks, selectTask]);
+     
+      fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
         method: "DELETE",
       })
         .then((response) => response.json())
         .then(() =>
-          setRemainingTasks(
-            data.todos.filter((task) => task.id !== selectedTask.id)
+          setTasks(
+            tasks.filter((task) => task.id !== selectTask.id)
           )
         );
+    } 
 
-      console.log("selectedTask", selectedTask);
-    }
-  };
-  console.log("tasks", tasks);
+    setSelectTask({id: null, value: "", completed: false, todo: ""})
+  }
+
   const onCheckedHandle = () => {
     const updatedTask = data.todos.map((task) =>
       task.id === selectTask.id
@@ -94,7 +114,11 @@ function Popup() {
         onChange={handleChange}
         label="Select a Task"
       />
-      {selectTask.id !== null && (
+      <div style={{margin: "10px auto", width:'100%'}}>
+        <Button onClick={addTaskHandle} fullWidth={true} variant="contained" style={{display: 'flex', flexDirection:'row', justifyContent:'space-between'}} endIcon={<AddIcon sx={{ color: "white" }} />}>Add task</Button>
+      </div>
+      
+      {/* {selectTask.id !== null && (
         <CardBox
           id={selectTask.id !== null ? selectTask.id : 0}
           value={selectTask.value}
@@ -102,7 +126,17 @@ function Popup() {
           //completed={selectTask.completed}
           onChecked={onCheckedHandle}
         />
-      )}
+      )} */}
+      {addedTasks.map((task) => (
+        <CardBox
+          key={task.id} 
+          id={task.id !== null ? task.id : 0}
+          value={task.value}
+          todo={task.todo}
+          completed={task.completed}
+          onChecked={onCheckedHandle}
+        />
+      ))}
     </div>
   );
 }

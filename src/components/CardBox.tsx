@@ -5,14 +5,15 @@ import {
   CardActions,
   Button,
   Typography,
-  Checkbox
+  Checkbox,
 } from "@mui/material";
+import SendIcon from '@mui/icons-material/Send';
 
 interface ITaskItem {
   id: number;
   value: string;
   todo: string;
-  //completed: boolean;
+  completed: boolean;
   onChecked: () => void
 }
 
@@ -22,29 +23,29 @@ export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo}) => {
     <>
       <Card variant="outlined" style={{margin:'15px 0'}}>
         <CardContent>
-          <Typography variant="h5" component="div">
+          <Typography sx={{ fontSize: 16, fontWeight: "bold" }} component="div">
            {todo}
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary">
             ID: {id}
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Timer: 00:00:00
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Total worked time: 00:00:00
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" >
           Completed:
             <Checkbox
-              //checked={completed} v prípade keby som nechcela zaškrtávať
+              //checked={completed} // v prípade keby som nechcela zaškrtávať
               onChange={onChecked}
               inputProps={{ 'aria-label': 'controlled' }}
             />
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">SEND TASK AS COMPLETED</Button>
+            <Button size="small" endIcon={<SendIcon color="primary" />}>SEND TASK</Button>
         </CardActions>
       </Card>
     </>

@@ -96,11 +96,13 @@ function Popup() {
   };
 
   const logInHandle = () => {
-    setIslogged((prevSetLogIn) => !prevSetLogIn )
+    setIslogged((prevSetLogIn) => !prevSetLogIn );
+    chrome.runtime.sendMessage({message: 'login'}, (response) => {});
   }
 
   const logOutHandle = () => {
-    setIslogged((prevSetLogOut) => !prevSetLogOut )
+    setIslogged((prevSetLogOut) => !prevSetLogOut );
+    chrome.runtime.sendMessage({message: 'logout'}, (response)=> {});
   }
 
   return (

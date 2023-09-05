@@ -43,3 +43,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } 
 
 })
+
+//https://www.youtube.com/watch?v=H-anyDrYHyg&list=PLIckDtOkqwLv56F0c8zbHDivaUQgJr9xw&index=1

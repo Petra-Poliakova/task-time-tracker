@@ -1,6 +1,7 @@
 {
     "version": "1.0.0",
     "manifest_version": 3,
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA52MXhviqwSVSS2gEMGwXO3v25H1+H78ZTvOFubL9QmkV2wVfboFHpmC6glKfbLamjMo7RSUlUR26imyB8gppKjbIbtg+wzotGJKZ6pvEqrXDLUhvjjiY2TZy3OJBcRiHaYa5fybmlfKCwQTAtL3/jMJa2Zi0uKV0a7kxIzDKUL01OfPFlfk2YzJqb4cksVJ+x4vJoOnEMlhXa8mdGXlCiXwGR7f0PRwx/ILn05JQYrFRwpGNvHslhDET8RYY46ZkrE2JC//Utw5biK30B9ZiZDdAzWUx8fHGpSdz6jau8kG5TB40nlapGWm48sWKTK8dyTywTZIwMC/ZNy7meYW1RQIDAQAB",
     "name": "Task Time Tracker",
     "description": "This is a Chrome extension built with React and TypeScript",
     "icons": {
@@ -22,5 +23,6 @@
         "matches": ["https://www.google.com/*"],
           "js": ["contentScript.js"]
       }
-  ]
+  ], 
+  "permissions": [ "identity" ]
 }

@@ -97,12 +97,34 @@ function Popup() {
 
   const logInHandle = () => {
     setIslogged((prevSetLogIn) => !prevSetLogIn );
-    chrome.runtime.sendMessage({message: 'login'}, (response) => {});
+    //chrome.runtime.sendMessage({message: 'login'}, (response) => {});
+    // chrome.identity.getAuthToken({ interactive: true }, function(token) {
+        
+    //   let init = {
+    //     method: 'GET',
+    //     async: true,
+    //     headers: {
+    //       Authorization: 'Bearer ' + token,
+    //       'Content-Type': 'application/json'
+    //     },
+    //     'contentType': 'json'
+    //   };
+    //   fetch(
+    //     'https://people.googleapis.com/v1/contactGroups/all?maxMembers=20',
+    //     init
+    //   )
+    //   .then((response) => response.json())
+    //   .then(function(data) {
+    //     console.log(data);
+    //     // Handle the API response here
+    //   });
+    // });
+    
   }
 
   const logOutHandle = () => {
     setIslogged((prevSetLogOut) => !prevSetLogOut );
-    chrome.runtime.sendMessage({message: 'logout'}, (response)=> {});
+    //chrome.runtime.sendMessage({message: 'logout'}, (response)=> {});
   }
 
   return (

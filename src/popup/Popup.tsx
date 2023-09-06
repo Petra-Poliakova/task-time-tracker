@@ -3,10 +3,10 @@ import "./Popup.css";
 import { useFetch } from "../hooks/useFetch";
 import { DropDown } from "../components/DropDown";
 import { SelectChangeEvent, Button } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import { CardBox  } from "../components/CardBox";
+import AddIcon from "@mui/icons-material/Add";
+import { CardBox } from "../components/CardBox";
+import { Header } from "../components/Header";
 //import { LogInOut  } from "../components/LogInOut";
-
 
 interface ITaskItem {
   id: number;
@@ -14,7 +14,6 @@ interface ITaskItem {
   completed: boolean;
   userId: number;
 }
-
 export interface ITasks {
   todos: ITaskItem[];
 }
@@ -30,13 +29,15 @@ function Popup() {
   // );
   const [tasks, setTasks] = useState<ITaskItem[]>([]);
   const [selectTask, setSelectTask] = useState<{
-    id: number | null;
+    id: string;
     value: string;
     todo: string;
     completed: boolean;
-  }>({ id: null, value: "", completed: false, todo: "" });
+  }>({ id: "", value: "", completed: false, todo: "" });
   //}>({ id: null, value: "", completed: false, todo: "" });
-  const [activeTasks, setActiveTasks] = useState<{ id: number | null; value: string; todo: string; completed: boolean; }[]>([]);
+  const [activeTasks, setActiveTasks] = useState<
+    { id: string; value: string; todo: string; completed: boolean }[]
+  >([]);
   //const [isLogged, setIslogged] = useState<boolean>(false);
 
   useEffect(() => {
@@ -45,13 +46,13 @@ function Popup() {
     console.log("tasksData", tasksData);
   }, [data]);
 
-  useEffect(()=> {
-    chrome.storage.local.get(['activeTask'], (result) => {
+  useEffect(() => {
+    chrome.storage.local.get(["activeTask"], (result) => {
       if (result.activeTask) {
-        setActiveTasks(result.activeTask)
+        setActiveTasks(result.activeTask);
       }
-    })
-  },[]);
+    });
+  }, []);
 
   if (loading) return <p>Loading...</p>;
 
@@ -66,21 +67,22 @@ function Popup() {
     const selectedTask = data.todos.find(
       (task) => task.todo === e.target.value
     );
+
     setSelectTask({
       ...selectTask,
       value: e.target.value,
-      id: selectedTask ? selectedTask.id : null,
+      id: selectedTask ? selectedTask.id.toString() : "",
       todo: selectedTask ? selectedTask.todo : "",
       completed: selectedTask ? selectedTask.completed : false,
     });
   };
 
   const addToActiveTasks = () => {
-    if (selectTask.id !== null) {
+    if (selectTask.id) {
       const updatedActiveTask = [...activeTasks, selectTask];
       setActiveTasks(updatedActiveTask);
-      chrome.storage.local.set({activeTask: updatedActiveTask});
-     
+      chrome.storage.local.set({ activeTask: updatedActiveTask });
+
       // fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
       //   method: "DELETE",
       // })
@@ -92,13 +94,12 @@ function Popup() {
       //   );
     }
 
-    setSelectTask({id: null, value: "", completed: false, todo: ""});
-    
-  }
+    setSelectTask({ id: "", value: "", completed: false, todo: "" });
+  };
 
   const onCheckedHandle = () => {
     const updatedTask = data.todos.map((task) =>
-      task.id === selectTask.id
+      task.id.toString() === selectTask.id
         ? { ...task, completed: !selectTask.completed }
         : task
     );
@@ -106,13 +107,15 @@ function Popup() {
     setTasks(updatedTask);
   };
 
-  const sendCompletedTask = (taskId: number | null) => {
+  const sendCompletedTask = (taskId: string) => {
     if (taskId !== null) {
-      const updatedActiveTask = activeTasks.filter((activeTask) => activeTask.id !== taskId);
-    setActiveTasks(updatedActiveTask);
+      const updatedActiveTask = activeTasks.filter(
+        (activeTask) => activeTask.id !== taskId
+      );
+      setActiveTasks(updatedActiveTask);
+      chrome.storage.local.set({ activeTask: updatedActiveTask });
     }
-    
-  }
+  };
 
   // const logInHandle = () => {
   //   setIslogged((prevSetLogIn) => !prevSetLogIn );
@@ -124,31 +127,50 @@ function Popup() {
 
   return (
     <div>
-      {/* {isLogged ? (
+      <Header />
+      <div className="popupContainer">
+        {/* {isLogged ? (
         <div> 
         <LogInOut colorStyle="success" onLogInOut={logOutHandle} textBtn="Log Out" /> */}
-          <DropDown
-            options={tasks.map((task) => task.todo)}
-            value={selectTask.value}
-            onChange={handleChange}
-            label="Select a Task"
-          />
-          <div style={{ margin: "10px auto", width: '100%' }}>
-            <Button onClick={addToActiveTasks} fullWidth={true} variant="contained" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} endIcon={<AddIcon sx={{ color: "white" }} />}>Add task</Button>
+        <div className="selectForm">
+          <div style={{ width: "80%", marginRight: "2%" }}>
+            <DropDown
+              options={tasks.map((task) => task.todo)}
+              value={selectTask.value}
+              onChange={handleChange}
+              label="Select a Task"
+            />
           </div>
 
-          {activeTasks.map((activeTask, index) => (
-            <CardBox
-              key={activeTask.id ? `${activeTask.id}_${index}` : `no-id_${index}`}
-              
-              id={activeTask.id}
-              value={activeTask.value}
-              todo={activeTask.todo}
-              completed={activeTask.completed}
-              onChecked={onCheckedHandle}
-              onClickSend={()=>sendCompletedTask(activeTask.id)}
-            />
-          ))}
+          <div style={{ width: "18%" }}>
+            <Button
+              onClick={addToActiveTasks}
+              fullWidth={true}
+              variant="contained"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                //justifyContent: "space-between",
+                padding: "15px 16px",
+              }}
+              endIcon={<AddIcon sx={{ color: "white" }} />}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
+
+        {activeTasks.map((activeTask, index) => (
+          <CardBox
+            key={activeTask.id ? `${activeTask.id}_${index}` : `no-id_${index}`}
+            id={activeTask.id}
+            value={activeTask.value}
+            todo={activeTask.todo}
+            completed={activeTask.completed}
+            onChecked={onCheckedHandle}
+            onClickSend={() => sendCompletedTask(activeTask.id)}
+          />
+        ))}
         {/* </div>
       ) : (
         <div>
@@ -156,9 +178,9 @@ function Popup() {
         </div>
         
       )} */}
+      </div>
     </div>
   );
 }
 
 export default Popup;
-

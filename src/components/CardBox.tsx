@@ -7,10 +7,10 @@ import {
   Typography,
   Checkbox,
 } from "@mui/material";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
 
 interface ITaskItem {
-  id: number | null;
+  id: string;
   value: string;
   todo: string;
   completed: boolean;
@@ -18,14 +18,22 @@ interface ITaskItem {
   onClickSend: () => void;
 }
 
-export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo, onClickSend}) => {
-
+export const CardBox: React.FC<ITaskItem> = ({
+  id,
+  value,
+  onChecked,
+  todo,
+  onClickSend,
+}) => {
   return (
     <>
-      <Card variant="outlined" style={{margin:'15px 0'}}>
+      <Card
+        variant="outlined"
+        style={{ margin: "15px 0", background: "#f5f5f5" }}
+      >
         <CardContent>
           <Typography sx={{ fontSize: 16, fontWeight: "bold" }} component="div">
-           {todo}
+            {todo}
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
             ID: {id}
@@ -36,17 +44,23 @@ export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo, onClic
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Total worked time: 00:00:00
           </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary" >
-          Completed:
+          <Typography sx={{ fontSize: 14 }} color="text.secondary">
+            Completed:
             <Checkbox
               //checked={completed} // v prípade keby som nechcela zaškrtávať
               onChange={onChecked}
-              inputProps={{ 'aria-label': 'controlled' }}
+              inputProps={{ "aria-label": "controlled" }}
             />
           </Typography>
         </CardContent>
         <CardActions>
-            <Button size="small" endIcon={<SendIcon color="primary" />} onClick={onClickSend}>Send taks as completed</Button>
+          <Button
+            size="small"
+            endIcon={<SendIcon color="primary" />}
+            onClick={onClickSend}
+          >
+            Send taks as completed
+          </Button>
         </CardActions>
       </Card>
     </>

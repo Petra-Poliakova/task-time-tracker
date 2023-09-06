@@ -10,14 +10,15 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 
 interface ITaskItem {
-  id: number;
+  id: number | null;
   value: string;
   todo: string;
   completed: boolean;
-  onChecked: () => void
+  onChecked: () => void;
+  onClickSend: () => void;
 }
 
-export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo}) => {
+export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo, onClickSend}) => {
 
   return (
     <>
@@ -45,7 +46,7 @@ export const CardBox: React.FC<ITaskItem> = ({id, value, onChecked, todo}) => {
           </Typography>
         </CardContent>
         <CardActions>
-            <Button size="small" endIcon={<SendIcon color="primary" />}>SEND TASK</Button>
+            <Button size="small" endIcon={<SendIcon color="primary" />} onClick={onClickSend}>Send taks as completed</Button>
         </CardActions>
       </Card>
     </>

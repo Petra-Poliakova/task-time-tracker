@@ -5,7 +5,7 @@ import { DropDown } from "../components/DropDown";
 import { SelectChangeEvent, Button } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import { CardBox  } from "../components/CardBox";
-import { LogInOut  } from "../components/LogInOut";
+//import { LogInOut  } from "../components/LogInOut";
 
 
 interface ITaskItem {
@@ -35,14 +35,23 @@ function Popup() {
     todo: string;
     completed: boolean;
   }>({ id: null, value: "", completed: false, todo: "" });
-  const [addedTasks, setAddedTasks] = useState<{ id: number | null; value: string; todo: string; completed: boolean; }[]>([]);
-  const [isLogged, setIslogged] = useState<boolean>(false);
+  //}>({ id: null, value: "", completed: false, todo: "" });
+  const [activeTasks, setActiveTasks] = useState<{ id: number | null; value: string; todo: string; completed: boolean; }[]>([]);
+  //const [isLogged, setIslogged] = useState<boolean>(false);
 
   useEffect(() => {
     const tasksData = data.todos.map((task) => task);
     setTasks(tasksData);
     console.log("tasksData", tasksData);
   }, [data]);
+
+  useEffect(()=> {
+    chrome.storage.local.get(['activeTask'], (result) => {
+      if (result.activeTask) {
+        setActiveTasks(result.activeTask)
+      }
+    })
+  },[]);
 
   if (loading) return <p>Loading...</p>;
 
@@ -58,7 +67,7 @@ function Popup() {
       (task) => task.todo === e.target.value
     );
     setSelectTask({
-      //...selectTask,
+      ...selectTask,
       value: e.target.value,
       id: selectedTask ? selectedTask.id : null,
       todo: selectedTask ? selectedTask.todo : "",
@@ -66,22 +75,25 @@ function Popup() {
     });
   };
 
-  const addTaskHandle = () => {
+  const addToActiveTasks = () => {
     if (selectTask.id !== null) {
-      setAddedTasks([...addedTasks, selectTask]);
+      const updatedActiveTask = [...activeTasks, selectTask];
+      setActiveTasks(updatedActiveTask);
+      chrome.storage.local.set({activeTask: updatedActiveTask});
      
-      fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
-        method: "DELETE",
-      })
-        .then((response) => response.json())
-        .then(() =>
-          setTasks(
-            tasks.filter((task) => task.id !== selectTask.id)
-          )
-        );
-    } 
+      // fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
+      //   method: "DELETE",
+      // })
+      //   .then((response) => response.json())
+      //   .then(() =>
+      //     setTasks(
+      //       tasks.filter((task) => task.id !== selectTask.id)
+      //     )
+      //   );
+    }
 
-    setSelectTask({id: null, value: "", completed: false, todo: ""})
+    setSelectTask({id: null, value: "", completed: false, todo: ""});
+    
   }
 
   const onCheckedHandle = () => {
@@ -94,19 +106,27 @@ function Popup() {
     setTasks(updatedTask);
   };
 
-  const logInHandle = () => {
-    setIslogged((prevSetLogIn) => !prevSetLogIn );
+  const sendCompletedTask = (taskId: number | null) => {
+    if (taskId !== null) {
+      const updatedActiveTask = activeTasks.filter((activeTask) => activeTask.id !== taskId);
+    setActiveTasks(updatedActiveTask);
+    }
+    
   }
 
-  const logOutHandle = () => {
-    setIslogged((prevSetLogOut) => !prevSetLogOut );
-  }
+  // const logInHandle = () => {
+  //   setIslogged((prevSetLogIn) => !prevSetLogIn );
+  // }
+
+  // const logOutHandle = () => {
+  //   setIslogged((prevSetLogOut) => !prevSetLogOut );
+  // }
 
   return (
     <div>
-      {isLogged ? (
-        <div>
-        <LogInOut colorStyle="success" onLogInOut={logOutHandle} textBtn="Log Out" /> 
+      {/* {isLogged ? (
+        <div> 
+        <LogInOut colorStyle="success" onLogInOut={logOutHandle} textBtn="Log Out" /> */}
           <DropDown
             options={tasks.map((task) => task.todo)}
             value={selectTask.value}
@@ -114,26 +134,28 @@ function Popup() {
             label="Select a Task"
           />
           <div style={{ margin: "10px auto", width: '100%' }}>
-            <Button onClick={addTaskHandle} fullWidth={true} variant="contained" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} endIcon={<AddIcon sx={{ color: "white" }} />}>Add task</Button>
+            <Button onClick={addToActiveTasks} fullWidth={true} variant="contained" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} endIcon={<AddIcon sx={{ color: "white" }} />}>Add task</Button>
           </div>
 
-          {addedTasks.map((task) => (
+          {activeTasks.map((activeTask, index) => (
             <CardBox
-              key={task.id}
-              id={task.id !== null ? task.id : 0}
-              value={task.value}
-              todo={task.todo}
-              completed={task.completed}
+              key={activeTask.id ? `${activeTask.id}_${index}` : `no-id_${index}`}
+              
+              id={activeTask.id}
+              value={activeTask.value}
+              todo={activeTask.todo}
+              completed={activeTask.completed}
               onChecked={onCheckedHandle}
+              onClickSend={()=>sendCompletedTask(activeTask.id)}
             />
           ))}
-        </div>
+        {/* </div>
       ) : (
         <div>
           <LogInOut colorStyle="error" onLogInOut={logInHandle} textBtn="Log In" />
         </div>
         
-      )}
+      )} */}
     </div>
   );
 }

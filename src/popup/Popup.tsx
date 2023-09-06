@@ -65,7 +65,6 @@ function Popup() {
       completed: selectedTask ? selectedTask.completed : false,
     });
   };
-  console.log("remainingTasks", tasks);
 
   const addTaskHandle = () => {
     if (selectTask.id !== null) {
@@ -97,34 +96,10 @@ function Popup() {
 
   const logInHandle = () => {
     setIslogged((prevSetLogIn) => !prevSetLogIn );
-    //chrome.runtime.sendMessage({message: 'login'}, (response) => {});
-    // chrome.identity.getAuthToken({ interactive: true }, function(token) {
-        
-    //   let init = {
-    //     method: 'GET',
-    //     async: true,
-    //     headers: {
-    //       Authorization: 'Bearer ' + token,
-    //       'Content-Type': 'application/json'
-    //     },
-    //     'contentType': 'json'
-    //   };
-    //   fetch(
-    //     'https://people.googleapis.com/v1/contactGroups/all?maxMembers=20',
-    //     init
-    //   )
-    //   .then((response) => response.json())
-    //   .then(function(data) {
-    //     console.log(data);
-    //     // Handle the API response here
-    //   });
-    // });
-    
   }
 
   const logOutHandle = () => {
     setIslogged((prevSetLogOut) => !prevSetLogOut );
-    //chrome.runtime.sendMessage({message: 'logout'}, (response)=> {});
   }
 
   return (
@@ -165,9 +140,3 @@ function Popup() {
 
 export default Popup;
 
-//https://www.youtube.com/watch?v=vzrwpaYwE5s&list=PLBS1L3Ug2VVpgpDEcLmapOk52mVGv4MIu&index=3
-//https://github.com/manshu/reactjs-chrome-extension-oauth2/blob/master/src/routes/Authentication.js
-
-//https://www.youtube.com/watch?v=H-anyDrYHyg&list=PLIckDtOkqwLv56F0c8zbHDivaUQgJr9xw
-
-//https://tasoskakour.com/blog/react-use-oauth2

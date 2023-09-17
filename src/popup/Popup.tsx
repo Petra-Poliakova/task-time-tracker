@@ -38,12 +38,14 @@ function Popup() {
   const [activeTasks, setActiveTasks] = useState<
     { id: string; value: string; todo: string; completed: boolean }[]
   >([]);
+  const [isBtnDisabled, setIsBtnDisabled] = useState<{
+    [taskId: string]: boolean;
+  }>({});
   //const [isLogged, setIslogged] = useState<boolean>(false);
 
   useEffect(() => {
     const tasksData = data.todos.map((task) => task);
     setTasks(tasksData);
-    console.log("tasksData", tasksData);
   }, [data]);
 
   useEffect(() => {
@@ -80,7 +82,10 @@ function Popup() {
   const addToActiveTasks = () => {
     if (selectTask.id) {
       const updatedActiveTask = [...activeTasks, selectTask];
+      //const updatedActiveTask = [...activeTasks];
+      //updatedActiveTask.unshift(selectTask);
       setActiveTasks(updatedActiveTask);
+      console.log("activeTasks", activeTasks);
       chrome.storage.local.set({ activeTask: updatedActiveTask });
 
       // fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
@@ -97,14 +102,19 @@ function Popup() {
     setSelectTask({ id: "", value: "", completed: false, todo: "" });
   };
 
-  const onCheckedHandle = () => {
+  const onCheckedHandle = (taskId: string) => {
     const updatedTask = data.todos.map((task) =>
-      task.id.toString() === selectTask.id
+      task.id.toString() === taskId
         ? { ...task, completed: !selectTask.completed }
         : task
     );
-
     setTasks(updatedTask);
+
+    const isDisabledSelectTask = {
+      ...isBtnDisabled,
+      [taskId]: !isBtnDisabled[taskId],
+    };
+    setIsBtnDisabled(isDisabledSelectTask);
   };
 
   const sendCompletedTask = (taskId: string) => {
@@ -167,8 +177,9 @@ function Popup() {
             value={activeTask.value}
             todo={activeTask.todo}
             completed={activeTask.completed}
-            onChecked={onCheckedHandle}
+            onChecked={() => onCheckedHandle(activeTask.id)}
             onClickSend={() => sendCompletedTask(activeTask.id)}
+            disabled={!isBtnDisabled[activeTask.id] || false}
           />
         ))}
         {/* </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -14,17 +14,24 @@ interface ITaskItem {
   value: string;
   todo: string;
   completed: boolean;
+  disabled: boolean;
   onChecked: () => void;
   onClickSend: () => void;
 }
 
 export const CardBox: React.FC<ITaskItem> = ({
   id,
-  value,
+  disabled,
   onChecked,
   todo,
   onClickSend,
 }) => {
+  const [buttonColor, setButtonColor] = useState("primary");
+
+  const handleButtonClick = () => {
+    setButtonColor("info");
+    onClickSend();
+  };
   return (
     <>
       <Card
@@ -47,7 +54,7 @@ export const CardBox: React.FC<ITaskItem> = ({
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Completed:
             <Checkbox
-              //checked={completed} // v prípade keby som nechcela zaškrtávať
+              //checked={completed}
               onChange={onChecked}
               inputProps={{ "aria-label": "controlled" }}
             />
@@ -56,8 +63,9 @@ export const CardBox: React.FC<ITaskItem> = ({
         <CardActions>
           <Button
             size="small"
-            endIcon={<SendIcon color="primary" />}
-            onClick={onClickSend}
+            endIcon={<SendIcon sx={{ color: buttonColor }} />}
+            onClick={handleButtonClick}
+            disabled={disabled}
           >
             Send taks as completed
           </Button>

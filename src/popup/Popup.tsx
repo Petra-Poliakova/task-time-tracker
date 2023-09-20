@@ -28,35 +28,25 @@ function Popup() {
   //   { todos: [] }
   // );
   const [tasks, setTasks] = useState<ITaskItem[]>([]);
-  const [selectTask, setSelectTask] = useState<{
-    id: string;
-    value: string;
-    todo: string;
-    completed: boolean;
-  }>({ id: "", value: "", completed: false, todo: "" });
-  //}>({ id: null, value: "", completed: false, todo: "" });
-  const [activeTasks, setActiveTasks] = useState<
-    { id: string; value: string; todo: string; completed: boolean }[]
-  >([]);
+  const [selectTask, setSelectTask] = useState<ITaskItem | null>(null);
+  const [activeTasks, setActiveTasks] = useState<ITaskItem[]>([]);
   const [isBtnDisabled, setIsBtnDisabled] = useState<{
     [taskId: string]: boolean;
   }>({});
   //const [isLogged, setIslogged] = useState<boolean>(false);
 
   useEffect(() => {
-    const tasksData = data.todos
-      .map((task) => task)
-      .filter((filterData) => filterData.completed === false);
+    const tasksData = data.todos.filter(
+      (filterData) => filterData.completed === false
+    );
     setTasks(tasksData);
   }, [data]);
 
   useEffect(() => {
-    chrome.storage.local.get(["activeTask"], (result) => {
+    chrome.storage.local.get(["activeTask", "isDisabled"], (result) => {
       if (result.activeTask) {
         setActiveTasks(result.activeTask);
       }
-    });
-    chrome.storage.local.get(["isDisabled"], (result) => {
       if (result.isDisabled) {
         setIsBtnDisabled(result.isDisabled);
       }
@@ -76,21 +66,14 @@ function Popup() {
     const selectedTask = data.todos.find(
       (task) => task.todo === e.target.value
     );
-
-    setSelectTask({
-      ...selectTask,
-      value: e.target.value,
-      id: selectedTask ? selectedTask.id.toString() : "",
-      todo: selectedTask ? selectedTask.todo : "",
-      completed: selectedTask ? selectedTask.completed : false,
-    });
+    if (selectedTask) {
+      setSelectTask(selectedTask);
+    }
   };
 
   const addToActiveTasks = () => {
-    if (selectTask.id) {
-      //const updatedActiveTask = [...activeTasks, selectTask];
-      const updatedActiveTask = [...activeTasks];
-      updatedActiveTask.unshift(selectTask);
+    if (selectTask) {
+      const updatedActiveTask = [selectTask, ...activeTasks];
 
       setActiveTasks(updatedActiveTask);
       chrome.storage.local.set({ activeTask: updatedActiveTask });
@@ -106,12 +89,12 @@ function Popup() {
       //   );
     }
 
-    setSelectTask({ id: "", value: "", completed: false, todo: "" });
+    setSelectTask(null);
   };
 
-  const onCheckedHandle = (taskId: string) => {
+  const onCheckedHandle = (taskId: number) => {
     const updatedTask = activeTasks.map((activeTask) =>
-      activeTask.id.toString() === taskId
+      activeTask.id === taskId
         ? { ...activeTask, completed: !activeTask.completed }
         : activeTask
     );
@@ -126,7 +109,7 @@ function Popup() {
     chrome.storage.local.set({ isDisabled: isDisabledSelectTask });
   };
 
-  const sendCompletedTask = (taskId: string) => {
+  const sendCompletedTask = (taskId: number) => {
     if (taskId !== null) {
       const updatedActiveTask = activeTasks.filter(
         (activeTask) => activeTask.id !== taskId
@@ -155,7 +138,7 @@ function Popup() {
           <div style={{ width: "80%", marginRight: "2%" }}>
             <DropDown
               options={tasks.map((task) => task.todo)}
-              value={selectTask.value}
+              value={selectTask ? selectTask.todo : ""}
               onChange={handleChange}
               label="Select a Task"
             />
@@ -183,7 +166,7 @@ function Popup() {
           <CardBox
             key={activeTask.id ? `${activeTask.id}_${index}` : `no-id_${index}`}
             id={activeTask.id}
-            value={activeTask.value}
+            value={activeTask.todo}
             todo={activeTask.todo}
             completed={activeTask.completed}
             onChecked={() => onCheckedHandle(activeTask.id)}

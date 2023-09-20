@@ -10,7 +10,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 
 interface ITaskItem {
-  id: string;
+  id: number;
   value: string;
   todo: string;
   completed: boolean;

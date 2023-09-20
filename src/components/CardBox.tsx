@@ -23,6 +23,7 @@ export const CardBox: React.FC<ITaskItem> = ({
   id,
   disabled,
   onChecked,
+  completed,
   todo,
   onClickSend,
 }) => {
@@ -54,7 +55,7 @@ export const CardBox: React.FC<ITaskItem> = ({
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Completed:
             <Checkbox
-              //checked={completed}
+              checked={completed}
               onChange={onChecked}
               inputProps={{ "aria-label": "controlled" }}
             />

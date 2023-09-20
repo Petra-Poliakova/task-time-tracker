@@ -1,10 +1,5 @@
 if(typeof init === 'undefined'){
     const init = function(){
-    //   const injectElement = document.createElement('div');
-    //   injectElement.className = 'rustyZone-element';
-    //   injectElement.innerHTML = 'Hello From the Rusty Zone Element';
-    //   document.body.appendChild(injectElement);
-  
       const hostEle = document.createElement('div');
       hostEle.className = 'rustyZone-element-host';
       hostEle.innerHTML = 'Hello From the Rusty Zone Element';

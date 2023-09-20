@@ -44,7 +44,9 @@ function Popup() {
   //const [isLogged, setIslogged] = useState<boolean>(false);
 
   useEffect(() => {
-    const tasksData = data.todos.map((task) => task).filter((filterData) => filterData.completed === false);
+    const tasksData = data.todos
+      .map((task) => task)
+      .filter((filterData) => filterData.completed === false);
     setTasks(tasksData);
   }, [data]);
 
@@ -86,7 +88,10 @@ function Popup() {
 
   const addToActiveTasks = () => {
     if (selectTask.id) {
-      const updatedActiveTask = [...activeTasks, selectTask];
+      //const updatedActiveTask = [...activeTasks, selectTask];
+      const updatedActiveTask = [...activeTasks];
+      updatedActiveTask.unshift(selectTask);
+
       setActiveTasks(updatedActiveTask);
       chrome.storage.local.set({ activeTask: updatedActiveTask });
 
@@ -106,19 +111,19 @@ function Popup() {
 
   const onCheckedHandle = (taskId: string) => {
     const updatedTask = activeTasks.map((activeTask) =>
-    activeTask.id.toString() === taskId
+      activeTask.id.toString() === taskId
         ? { ...activeTask, completed: !activeTask.completed }
         : activeTask
     );
     setActiveTasks(updatedTask);
-    chrome.storage.local.set({activeTask: updatedTask });
+    chrome.storage.local.set({ activeTask: updatedTask });
 
     const isDisabledSelectTask = {
       ...isBtnDisabled,
       [taskId]: !isBtnDisabled[taskId],
     };
     setIsBtnDisabled(isDisabledSelectTask);
-    chrome.storage.local.set({isDisabled: isDisabledSelectTask})
+    chrome.storage.local.set({ isDisabled: isDisabledSelectTask });
   };
 
   const sendCompletedTask = (taskId: string) => {
@@ -129,7 +134,7 @@ function Popup() {
       setActiveTasks(updatedActiveTask);
       chrome.storage.local.set({ activeTask: updatedActiveTask });
     }
-  }; 
+  };
 
   // const logInHandle = () => {
   //   setIslogged((prevSetLogIn) => !prevSetLogIn );

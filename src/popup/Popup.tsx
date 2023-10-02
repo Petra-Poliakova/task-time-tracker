@@ -40,13 +40,7 @@ function Popup() {
       (filterData) => filterData.completed === false
     );
     setTasks(tasksData);
-    //SetTasksData();
   }, [data]);
-  //  const SetTasksData = () => {
-  //    setTasks(
-  //      data.todos.filter((filterData) => filterData.completed === false)
-  //    );
-  //  };
 
   useEffect(() => {
     chrome.storage.local.get(

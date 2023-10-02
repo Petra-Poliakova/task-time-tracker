@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "./Popup.css";
 import { useFetch } from "../hooks/useFetch";
 import { DropDown } from "../components/DropDown";
@@ -43,14 +43,20 @@ function Popup() {
   }, [data]);
 
   useEffect(() => {
-    chrome.storage.local.get(["activeTask", "isDisabled"], (result) => {
-      if (result.activeTask) {
-        setActiveTasks(result.activeTask);
+    chrome.storage.local.get(
+      ["activeTask", "isDisabled", "deleteTasks"],
+      (result) => {
+        if (result.activeTask) {
+          setActiveTasks(result.activeTask);
+        }
+        if (result.isDisabled) {
+          setIsBtnDisabled(result.isDisabled);
+        }
+        if (result.deleteTasks) {
+          setTasks(result.deleteTasks);
+        }
       }
-      if (result.isDisabled) {
-        setIsBtnDisabled(result.isDisabled);
-      }
-    });
+    );
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -58,6 +64,12 @@ function Popup() {
   if (!data || !data.todos) {
     return <p>Data not available.</p>;
   }
+
+  const SetTasksData = () => {
+    setTasks(data.todos.filter((filterData) => filterData.completed === false));
+  };
+  SetTasksData();
+  console.log("SetTasksData", tasks);
 
   const handleChange = (
     e: SelectChangeEvent<string>,
@@ -71,25 +83,52 @@ function Popup() {
     }
   };
 
-  const addToActiveTasks = () => {
+  const addToActiveTasks = async () => {
     if (selectTask) {
       const updatedActiveTask = [selectTask, ...activeTasks];
 
       setActiveTasks(updatedActiveTask);
-      chrome.storage.local.set({ activeTask: updatedActiveTask });
+      //chrome.storage.local.set({ activeTask: updatedActiveTask });
 
-      // fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
-      //   method: "DELETE",
-      // })
-      //   .then((response) => response.json())
-      //   .then(() =>
-      //     setTasks(
-      //       tasks.filter((task) => task.id !== selectTask.id)
-      //     )
-      //   );
+      await new Promise<void>((resolve) => {
+        chrome.storage.local.set({ activeTask: updatedActiveTask }, () => {
+          resolve();
+        });
+      });
+
+      //   await fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
+      //     method: "DELETE",
+      //   }).then((response) => response.json());
+      //   // .then(() =>
+      //   //   setTasks(tasks.filter((task) => task.id !== selectTask.id))
+      //   // );
+      //   const updatedTasks = tasks.filter((task) => task.id !== selectTask.id);
+      //   setTasks(updatedTasks);
+      //   chrome.storage.local.set({ sendTasks: updatedTasks });
+      // }
+      deleteSelectedTaskFromDropDown();
     }
+  };
 
-    setSelectTask(null);
+  const deleteSelectedTaskFromDropDown = async () => {
+    if (selectTask) {
+      await fetch(`https://dummyjson.com/todos/${selectTask.id}`, {
+        method: "DELETE",
+      }).then((response) => response.json());
+
+      const updatedTasks = tasks.filter((task) => task.id !== selectTask.id);
+      setTasks(updatedTasks);
+
+      setSelectTask(null);
+
+      chrome.storage.local.set({ deleteTasks: updatedTasks });
+
+      // await new Promise<void>((resolve) => {
+      //   chrome.storage.local.set({ deleteTasks: updatedTasks }, () => {
+      //     resolve();
+      //   });
+      // });
+    }
   };
 
   const onCheckedHandle = (taskId: number) => {
@@ -117,6 +156,17 @@ function Popup() {
       setActiveTasks(updatedActiveTask);
       chrome.storage.local.set({ activeTask: updatedActiveTask });
     }
+  };
+
+  const clearAllCompletedTask = () => {
+    //   const updatedActiveTask = activeTasks.filter(
+    //     (activeTask) => activeTask.completed === false
+    //   );
+    //   setActiveTasks(updatedActiveTask);
+    //   chrome.storage.local.set({ activeTask: updatedActiveTask });
+    // }
+    setActiveTasks([]);
+    chrome.storage.local.clear();
   };
 
   // const logInHandle = () => {
@@ -174,6 +224,9 @@ function Popup() {
             disabled={!isBtnDisabled[activeTask.id]}
           />
         ))}
+        <div>
+          <Button onClick={clearAllCompletedTask}>Clear All</Button>
+        </div>
         {/* </div>
       ) : (
         <div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import "./Popup.css";
 import { useFetch } from "../hooks/useFetch";
 import { DropDown } from "../components/DropDown";
@@ -40,7 +40,13 @@ function Popup() {
       (filterData) => filterData.completed === false
     );
     setTasks(tasksData);
+    //SetTasksData();
   }, [data]);
+  //  const SetTasksData = () => {
+  //    setTasks(
+  //      data.todos.filter((filterData) => filterData.completed === false)
+  //    );
+  //  };
 
   useEffect(() => {
     chrome.storage.local.get(
@@ -64,12 +70,6 @@ function Popup() {
   if (!data || !data.todos) {
     return <p>Data not available.</p>;
   }
-
-  const SetTasksData = () => {
-    setTasks(data.todos.filter((filterData) => filterData.completed === false));
-  };
-  SetTasksData();
-  console.log("SetTasksData", tasks);
 
   const handleChange = (
     e: SelectChangeEvent<string>,

@@ -3,6 +3,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 });
 
+// chrome.storage.local.get(['timerValue', 'isTimerRunning'], (res) => {
+//     chrome.storage.local.set({
+//         timerValue: "timerValue" in res ? res.timerValue : 0,
+//         isTimerRunning: "isTimerRunning" in res ? res.isTimerRunning : false,
+//     })
+// })
+
 // try{
 // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     if(changeInfo.status === 'complete' && tab.id !== undefined) {

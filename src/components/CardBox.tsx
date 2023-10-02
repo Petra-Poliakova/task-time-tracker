@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -6,8 +6,13 @@ import {
   Button,
   Typography,
   Checkbox,
+  IconButton
 } from "@mui/material";
+//import {SendIcon, PlayCircleFilledWhiteOutlinedIcon,PauseCircleOutlineOutlinedIco  } from '@mui/icons-material';
 import SendIcon from "@mui/icons-material/Send";
+import PlayCircleFilledWhiteOutlinedIcon from '@mui/icons-material/PlayCircleFilledWhiteOutlined';
+import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
+import { red } from "@mui/material/colors";
 
 interface ITaskItem {
   id: number;
@@ -16,8 +21,17 @@ interface ITaskItem {
   completed: boolean;
   disabled: boolean;
   onChecked: () => void;
+  //onStartTimer: () => void;
   onClickSend: () => void;
+
 }
+interface ITimerData {
+  hours: string;
+  minutes: string;
+  seconds: string
+
+}
+type Timer = ReturnType<typeof setTimeout>
 
 export const CardBox: React.FC<ITaskItem> = ({
   id,
@@ -25,9 +39,67 @@ export const CardBox: React.FC<ITaskItem> = ({
   onChecked,
   completed,
   todo,
+  //onStartTimer,
   onClickSend,
 }) => {
   const [buttonColor, setButtonColor] = useState("primary");
+  const [time, setTime] = useState<ITimerData>({hours: "", minutes:"", seconds:""})
+  const [timerValue, setTimerValue] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  // useEffect(() => {
+  //   chrome.storage.local.get(['timerValue', 'hours', 'minutes', 'seconds', 'isTimerRunning'], (res) => {
+  //      if (res.hours) setTime(res.time.hours);
+  //      if (res.minutes) setTime(res.time.minutes);
+  //      if (res.seconds) setTime(res.time.seconds);
+  //     if(res.timerValue) setTimerValue(res.timerValue);
+  //     if (res.isTimerRunning) setIsTimerRunning(res.isTimerRunning);
+  //   });
+  // }, []);
+
+  useEffect(() => {
+    let timerValue: Timer;
+    //let timer: NodeJS.Timeout | undefined;
+
+    if(isTimerRunning) {
+      timerValue = setInterval(() => {
+        setTimerValue((prevValue) => prevValue + 1);
+      }, 1000);
+      
+    }
+
+    return () => {
+      if (timerValue !== undefined) {
+        clearInterval(timerValue);
+      }
+      //chrome.storage.local.set({timerValue: timerValue});
+    };
+  }, [isTimerRunning]);
+
+  useEffect(() => {
+      // Calculate hours, minutes, and seconds from timerValue
+    const hours = (Math.floor(timerValue / 3600)).toString().padStart(2, "0");
+    const minutes = (Math.floor((timerValue % 3600) / 60)).toString().padStart(2, "0");
+    const seconds = (timerValue % 60).toString().padStart(2, "0");
+
+    setTime({hours: hours, minutes: minutes, seconds: seconds});
+
+    //chrome.storage.local.set({hours: hours, minutes: minutes, seconds: seconds })
+
+  }, [timerValue]);
+
+  const onStartTimer = () => {
+    setIsTimerRunning(true);
+
+    //chrome.storage.local.set({isTimerRunning: true });
+  }
+
+const onTimerStop = () => {
+  setIsTimerRunning(false);
+
+  //chrome.storage.local.set({isTimerRunning: false });
+}  
+ 
 
   const handleButtonClick = () => {
     setButtonColor("info");
@@ -47,7 +119,13 @@ export const CardBox: React.FC<ITaskItem> = ({
             ID: {id}
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
-            Timer: 00:00:00
+            Timer: {`${time.hours}:${time.minutes}:${time.seconds}`}
+            {!isTimerRunning ? <IconButton aria-label="" onClick={onStartTimer}>
+              <PlayCircleFilledWhiteOutlinedIcon color="primary"/>
+            </IconButton> :
+            <IconButton aria-label="" onClick={onTimerStop}>
+              <PauseCircleOutlineOutlinedIcon sx={{ color: red[800] }}/>
+            </IconButton>}
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Total worked time: 00:00:00

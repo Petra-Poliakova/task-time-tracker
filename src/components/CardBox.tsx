@@ -41,19 +41,16 @@ export const CardBox: React.FC<ITaskItem> = ({
   onClickSend,
 }) => {
   const [buttonColor, setButtonColor] = useState("primary");
-  const [time, setTime] = useState<ITimerData>({
-    hours: "",
-    minutes: "",
-    seconds: "",
-  });
+  const [time, setTime] = useState<ITimerData>({ hours: "", minutes: "", seconds: "" });
   const [timerValue, setTimerValue] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
+// Load data from chrome.storage.local
   useEffect(() => {
     chrome.storage.local.get(
-      ["timerValue", "timerData", "isTimerRunning"],
+      [ "timerData", "isTimerRunning"],
       (res) => {
-        if (res.timerValue) setTimerValue(res.timerValue);
+        // if (res.timerValue) setTimerValue(res.timerValue);
         if (res.timerData) setTime(res.timerData);
         if (res.isTimerRunning) setIsTimerRunning(res.isTimerRunning);
       }
@@ -76,23 +73,23 @@ export const CardBox: React.FC<ITaskItem> = ({
   }, [isTimerRunning]);
 
   useEffect(() => {
-    chrome.storage.local.set({ timerData: time });
-  }, [time]);
-
-  useEffect(() => {
-    // Calculate hours, minutes, and seconds from timerValue
-    const hours = Math.floor(timerValue / 3600)
-      .toString()
-      .padStart(2, "0");
-    const minutes = Math.floor((timerValue % 3600) / 60)
-      .toString()
-      .padStart(2, "0");
-    const seconds = (timerValue % 60).toString().padStart(2, "0");
+    chrome.storage.local.get(["timerValue"], (res) => {
+         // Calculate hours, minutes, and seconds from timerValue
+    const hours = Math.floor(res.timerValue / 3600).toString().padStart(2, "0");
+    const minutes = Math.floor((res.timerValue % 3600) / 60).toString().padStart(2, "0");
+    const seconds = (res.timerValue % 60).toString().padStart(2, "0");
 
     setTime({ hours: hours, minutes: minutes, seconds: seconds });
+    });
 
-    chrome.storage.local.set({ timerValue: timerValue });
-  }, [timerValue]);
+    chrome.storage.local.set({ timerData: time });
+
+    if (isTimerRunning) {
+      chrome.runtime.sendMessage({ startTimer: true });
+    } else {
+      chrome.runtime.sendMessage({ stopTimer: true });
+    }
+  }, [timerValue, isTimerRunning]);
 
   const onStartTimer = () => {
     setIsTimerRunning(true);
@@ -134,9 +131,6 @@ export const CardBox: React.FC<ITaskItem> = ({
                 <PauseCircleOutlineOutlinedIcon sx={{ color: red[800] }} />
               </IconButton>
             )}
-          </Typography>
-          <Typography sx={{ fontSize: 14 }} color="text.secondary">
-            Total worked time: 00:00:00
           </Typography>
           <Typography sx={{ fontSize: 14 }} color="text.secondary">
             Completed:

@@ -1,12 +1,18 @@
 let timerValue: number = 0;
 let timerInterval: ReturnType<typeof setTimeout> | undefined;
 
+// // Load timerValue from chrome.storage.local when the extension is loaded
+// chrome.storage.local.get("timerValue", (result) => {
+//   if (result.timerValue !== undefined) {
+//     timerValue = result.timerValue;
+//   }
+// });
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.startTimer) {
     if (!timerInterval) {
       timerInterval = setInterval(() => {
         timerValue += 1;
-        // Uložte timerValue do chrome.storage.local, ak je to potrebné
         chrome.storage.local.set({ timerValue });
       }, 1000);
     }
@@ -15,40 +21,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       clearInterval(timerInterval);
       timerInterval = undefined;
     }
-    // Uložte timerValue do chrome.storage.local, ak je to potrebné
     chrome.storage.local.set({ timerValue });
   }
 });
 
-chrome.storage.local.get(
-  ["timerValue", "isTimerRunning", "timerData"],
-  (res) => {
+chrome.storage.local.get(["timerValue"], (res) => {
     chrome.storage.local.set({
       timerValue: "timerValue" in res ? res.timerValue : 0,
-      imerData: "timerData" in res ? res.timerData : {},
-      isTimerRunning: "isTimerRunning" in res ? res.isTimerRunning : false,
+      // isTimerRunning: "isTimerRunning" in res ? res.isTimerRunning : false,
+      // timerData: "timerData" in res ? res.timerData : {}
     });
   }
 );
 
-// try{
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//     if(changeInfo.status === 'complete' && tab.id !== undefined) {
-//         chrome.scripting.executeScript({
-//             files: ['injectContent.js'],
-//             target: {tabId: tab.id as number},
-//         })
-//     }
-// });
-// }catch(e){
-//     console.log(e);
-//   }
-// chrome.storage.local.get(['activeTask'], (res) => {
-//     chrome.storage.local.set({
-//         activeTask: "activeTask" in res ? res.activeTask : []
-//     })
-
-// })
 
 //https://www.youtube.com/watch?v=qwEFy4FTbNY&list=PLxOYpovHh6ISG4dqNfckBiuoT2eXMC5iU
 //https://www.youtube.com/watch?v=tOHpufRbsJc
